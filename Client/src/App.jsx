@@ -18,7 +18,7 @@ export const App = () => {
       <Routes>
         <Route path="/login" element={<LoginLanding />} />
         <Route path="/login/admin" element={<Loginform role="admin" title="Admin Portal" subtitle="Sign in to manage the organization" />} />
-        <Route path="/login/employee" element={<Loginform role="employee" title="Employee Portal" subtitle="Sign in to access ypur account" />} />
+        <Route path="/login/employee" element={<Loginform role="employee" title="Employee Portal" subtitle="Sign in to access your account" />} />
 
 
 
