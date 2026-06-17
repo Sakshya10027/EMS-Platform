@@ -1,6 +1,7 @@
 import { useCallback, useState, useEffect } from "react"
 import {dummyEmployeeData,DEPARTMENTS} from "../assets/assets"
 import {Plus, Search} from "lucide-react"
+import EmployeeCard from "../components/EmployeeCard"
 
 
 const Employees = () => {
@@ -8,18 +9,23 @@ const Employees = () => {
     const [loading,setLoading] = useState(true)
     const [search , setSearch] = useState("")
     const [selectDept ,setSelectDept] = useState("")
+    const [editEmployee,setEditEmployee] = useState(null)
+    const [showCreateModal,setShowCreateModal] = useState(false)
 
     const fetchEmployees = useCallback(async()=>{
         setLoading(true)
-        setEmployees(dummyEmployeeData)
+        setEmployees(dummyEmployeeData.filter((emp)=>(selectDept ? emp.department === selectDept : true)))
         setTimeout(()=>{
             setLoading(false)
         },1000)
-    },[])
+    },[selectDept])
 
     useEffect(()=>{
         fetchEmployees();
-    },[])
+    },[fetchEmployees])
+
+
+    const filtered = employees.filter((emp)=>`${emp.firstName} ${emp.lastName} ${emp.position}`.toLowerCase().includes(search.toLowerCase()))
 
     return (
         <div className="animate-fade-in">
@@ -47,6 +53,19 @@ const Employees = () => {
                 </select>
             </div>
             {/* Employee card */}
+            {loading ? (
+                <div className="flex justify-center p-12">
+                    <div className="animate-spin h-8 w-8 border-2 border-indigo-600 border-t-transport rounded-full"/>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+                    {filtered.length === 0 ? (
+                        <p className="col-span-full text-center py-16 text-slate-400 bg-white rounded-2xl border border-dashed border-slate-200">No employees found</p>
+                    ): (
+                        filtered.map((emp)=><EmployeeCard key={emp.id} employee={emp} onDelete={fetchEmployees} onEdit={(e)=>setEditEmployee(e)}/>)
+                    )}
+                </div>
+            )}
 
         </div>
     )
