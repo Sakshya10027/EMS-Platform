@@ -10,7 +10,7 @@ const Payslips = () => {
     const [employees, setEmployees] = useState([])
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const isAdmin = true;
+    const isAdmin = false;
 
     const fetchPayslips = useCallback(async () => {
         setPayslips(dummyPayslipData)
