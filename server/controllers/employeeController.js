@@ -123,7 +123,7 @@ export const deleteEmployees = async (req, res) => {
         employee.isDeleted = true;
         employee.employementStatus = "INACTIVE"
         await employee.save()
-        return res.josn({ success: true });
+        return res.json({ success: true });
     } catch (error) {
         return res.status(500).json({ error: "Failed to delete employee" });
     }
