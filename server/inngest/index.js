@@ -19,7 +19,7 @@ const autoCheckOut = inngest.createFunction(
         // get Attendance data
         let attendance = await Attendance.findById(attendanceId)
 
-        if (!attendance?.CheckOut) {
+        if (!attendance?.checkOut) {
             // Get employee data
             const employee = await Employee.findById(employeeId)
 
@@ -29,9 +29,9 @@ const autoCheckOut = inngest.createFunction(
             await step.sleepUntil("wait-for-the-1-hour", new Date(new Date().getTime() + 1 * 60 * 60 * 1000))
 
             attendance = await Attendance.findById(attendanceId)
-            if (!attendance?.CheckOut) {
+            if (!attendance?.checkOut) {
                 attendance.checkOut = new Date(attendance.checkIn).getTime() + 4 * 60 * 60 * 1000;
-                attendance.workinghours = 4;
+                attendance.workingHours = 4;
                 attendance.dayType = "Half Day"
                 attendance.status = "LATE";
                 await attendance.save();
@@ -77,7 +77,7 @@ const attendanceReminderCron = inngest.createFunction(
         const activeEmployees = await step.run("get-active-employees", async () => {
             const employees = await Employee.find({
                 isDeleted: false,
-                employementStatus: "ACTIVE"
+                employmentStatus: "ACTIVE"
             }).lean();
             return employees.map((e) => ({ _id: e._id.toString(), firstName: e.firstName, lastName: e.lastName, email: e.email, department: e.department }))
         })

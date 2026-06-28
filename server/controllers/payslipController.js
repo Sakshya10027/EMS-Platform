@@ -20,7 +20,7 @@ export const createPayslip = async (req, res) => {
             basicSalary: Number(basicSalary),
             allowances: Number(allowances || 0),
             deductions: Number(deductions || 0),
-            netSalary,
+            netsalary,
         })
 
         return res.json({ success: true, data: payslip })
@@ -36,7 +36,7 @@ export const getPayslip = async (req, res) => {
         const session = req.session;
         const isAdmin = session.role === "ADMIN";
         if (isAdmin) {
-            const payslips = (await Payslip.find().populate("employeeId")).toSorted({ createdAt: -1 });
+            const payslips = await Payslip.find().sort({ createdAt: -1 }).populate("employeeId");
             const data = payslips.map((p) => {
                 const obj = p.toObject();
                 return {
@@ -65,9 +65,9 @@ export const getPayslip = async (req, res) => {
 // GET /api/payslips/:id
 export const getPayslipById = async (req, res) => {
     try {
-        const payslip = await Payslip.findById(req.params, id).populate("employeeId").lean();
+        const payslip = await Payslip.findById(req.params.id).populate("employeeId").lean();
 
-        if (!payslip) return res.status(404)({ error: "Not found" });
+        if (!payslip) return res.status(404).json({ error: "Not found" });
 
         const result = {
             ...payslip,
