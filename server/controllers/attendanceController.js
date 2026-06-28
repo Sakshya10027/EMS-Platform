@@ -1,4 +1,4 @@
-import Attendance from "../models/Attendane.js";
+import Attendance from "../models/Attendance.js";
 import Employee from "../models/Employee.js"
 
 // Clock in/out for employee
@@ -27,7 +27,7 @@ export const clockInOut = async (req, res) => {
             const isLate = now.getHours() >= 9 && now.getMinutes() > 0;
             const attendance = await Attendance.create({
                 employeeId: employee._id,
-                dtae: today,
+                date: today,
                 checkIn: now,
                 status: isLate ? "LATE" : "PRESENT"
             })
@@ -74,11 +74,11 @@ export const getAttendance = async (req, res) => {
         if (!employee) return res.status(404).json({ error: "Employee not found" });
 
         const limit = parseInt(req.query.limit || 30);
-        const history = (await Attendance.find({ employeeId: employee._id })).sort({ date: -1 }).limit(limit)
+        const history = await Attendance.find({ employeeId: employee._id }).sort({ date: -1 }).limit(limit);
 
         return res.json({
             data: history,
-            employee: { isDeletd: employee.isdeleted }
+            employee: { isDeleted: employee.isDeleted }
         })
     } catch (error) {
         return res.status(500).json({ error: "Operation failed" });
