@@ -33,7 +33,7 @@ export const createLeave = async (req, res) => {
             return res.status(400).json({ error: "End date cannot be before start date" });
         }
 
-        const leave = LeaveApplication.create({
+        const leave = await LeaveApplication.create({
             employeeId: employee._id,
             type,
             startDate: new Date(startDate),
@@ -69,7 +69,7 @@ export const getLeaves = async (req, res) => {
                     employeeId: obj.employeeId?._id?.toString(),
                 }
             })
-            return re.json({ data })
+            return res.json({ data })
         } else {
             const employee = await Employee.findOne({
                 userId: session.userId,

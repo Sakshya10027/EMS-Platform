@@ -12,7 +12,7 @@ const employeeSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    lasttName: {
+    lastName: {
         type: String,
         required: true
     },
@@ -40,11 +40,10 @@ const employeeSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    employeeStatus: {
+    employmentStatus: {
         type: String,
         default: "ACTIVE",
         enum: ["ACTIVE", "INACTIVE"],
-        default: "ACTIVE"
     },
     joinDate: {
         type: Date,

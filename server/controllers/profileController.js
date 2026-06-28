@@ -13,7 +13,7 @@ export const getProfile = async (req, res) => {
             return res.json({
                 firstName: "ADMIN",
                 lastName: "",
-                email: session, email,
+                email: session.email,
             })
         }
         return res.json(employee)
