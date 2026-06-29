@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { XIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import api from '../../api/axios';
 
 const ChangePasswordModal = ({ isOpen, onClose }) => {
     const [passwords, setPasswords] = useState({
@@ -8,6 +9,8 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
         newPassword: '',
         confirmPassword: ''
     });
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState({ type: "", text: "" });
 
     if (!isOpen) return null;
 
@@ -15,9 +18,9 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
         setPasswords({ ...passwords, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (passwords.newPassword !== passwords.confirmPassword) {
             toast.error("New passwords do not match!");
             return;
@@ -28,9 +31,28 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
             return;
         }
 
-        toast.success("Password updated successfully!");
-        setPasswords({ currentPassword: '', newPassword: '', confirmPassword: '' });
-        onClose();
+        setLoading(true);
+        setMessage({ type: "", text: "" });
+
+        try {
+            const { data } = await api.post("/auth/change-password", { 
+                currentPassword: passwords.currentPassword, 
+                newPassword: passwords.newPassword 
+            });
+            
+            if (!data.success) throw new Error(data.error || "Failed");
+
+            setMessage({ type: "success", text: "Password updated successfully" });
+            toast.success("Password updated successfully!");
+            setPasswords({ currentPassword: '', newPassword: '', confirmPassword: '' });
+            // Let the modal stay open briefly to show the message, or just close it? The user's screenshot shows the message inside the modal, so we shouldn't close it immediately.
+            // onClose(); 
+        } catch (error) {
+            setMessage({ type: "error", text: error.response?.data?.error || error.message });
+            toast.error(error.response?.data?.error || error.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -42,12 +64,18 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                         <XIcon className="w-5 h-5" />
                     </button>
                 </div>
-                
+
                 <form onSubmit={handleSubmit} className="p-6 space-y-5">
+                    {message.text && (
+                        <div className={`px-4 py-3 rounded-lg text-sm flex items-center gap-2 ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}`}>
+                            <div className={`w-1.5 h-1.5 rounded-full ${message.type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'}`}></div>
+                            {message.text}
+                        </div>
+                    )}
                     <div>
                         <label className="block text-[13px] font-medium text-slate-700 mb-1">Current Password</label>
-                        <input 
-                            type="password" 
+                        <input
+                            type="password"
                             name="currentPassword"
                             value={passwords.currentPassword}
                             onChange={handleChange}
@@ -58,8 +86,8 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
 
                     <div>
                         <label className="block text-[13px] font-medium text-slate-700 mb-1">New Password</label>
-                        <input 
-                            type="password" 
+                        <input
+                            type="password"
                             name="newPassword"
                             value={passwords.newPassword}
                             onChange={handleChange}
@@ -70,8 +98,8 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
 
                     <div>
                         <label className="block text-[13px] font-medium text-slate-700 mb-1">Confirm New Password</label>
-                        <input 
-                            type="password" 
+                        <input
+                            type="password"
                             name="confirmPassword"
                             value={passwords.confirmPassword}
                             onChange={handleChange}
@@ -81,18 +109,19 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                     </div>
 
                     <div className="pt-2 flex gap-3">
-                        <button 
+                        <button
                             type="button"
                             onClick={onClose}
                             className="flex-1 px-4 py-2.5 rounded-lg border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-all"
                         >
                             Cancel
                         </button>
-                        <button 
+                        <button
                             type="submit"
-                            className="flex-1 px-4 py-2.5 rounded-lg bg-[#5A67D8] text-white text-sm font-medium hover:bg-indigo-700 transition-all"
+                            disabled={loading}
+                            className="flex-1 px-4 py-2.5 rounded-lg bg-[#5A67D8] text-white text-sm font-medium hover:bg-indigo-700 transition-all disabled:opacity-50"
                         >
-                            Update
+                            {loading ? "Updating..." : "Update Password"}
                         </button>
                     </div>
                 </form>

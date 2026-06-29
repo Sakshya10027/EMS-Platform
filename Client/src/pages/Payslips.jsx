@@ -4,19 +4,27 @@ import Loading from "../components/Loading"
 import PayslipList from "../components/Payslips/PayslipList"
 import GeneratePayslipModal from "../components/Payslips/GeneratePayslipModal"
 import { PlusIcon } from "lucide-react"
+import { useAuth } from "../context/AuthContext"
+import api from "../api/axios"
+import toast from "react-hot-toast"
 
 const Payslips = () => {
     const [payslips, setPayslips] = useState([])
     const [employees, setEmployees] = useState([])
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const isAdmin = false;
+    const { user } = useAuth()
+    const isAdmin = user?.role === "ADMIN";
 
     const fetchPayslips = useCallback(async () => {
-        setPayslips(dummyPayslipData)
-        setTimeout(() => {
-            setLoading(false);
-        }, 1000);
+        try {
+            const res = await api.get("/payslips")
+            setPayslips(res.data.data || [])
+        } catch (error) {
+            toast.error(error?.response?.data?.error || error?.message);
+        } finally {
+            setLoading(false)
+        }
     }, [])
 
     useEffect(() => {
@@ -24,7 +32,7 @@ const Payslips = () => {
     }, [fetchPayslips])
 
     useEffect(() => {
-        if (isAdmin) setEmployees(dummyEmployeeData)
+        if (isAdmin) api.get("/employees").then((res) => setEmployees(res.data.filter((e) => !e.isDeleted))).catch(() => { })
     }, [isAdmin])
 
     const handleGeneratePayslip = (newPayslip) => {
@@ -41,7 +49,7 @@ const Payslips = () => {
                     <p className="text-sm text-slate-500 mt-1">{isAdmin ? "Generate and manage employee payslips" : "Your payslip history"}</p>
                 </div>
                 {isAdmin && (
-                    <button 
+                    <button
                         onClick={() => setIsModalOpen(true)}
                         className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[#5A67D8] text-white text-sm font-semibold hover:bg-indigo-700 transition-colors shadow-sm"
                     >
@@ -50,11 +58,11 @@ const Payslips = () => {
                     </button>
                 )}
             </div>
-            
+
             <PayslipList payslips={payslips} isAdmin={isAdmin} />
 
             {isAdmin && (
-                <GeneratePayslipModal 
+                <GeneratePayslipModal
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
                     onSubmit={handleGeneratePayslip}
