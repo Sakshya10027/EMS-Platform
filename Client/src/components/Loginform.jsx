@@ -6,8 +6,8 @@ import { useAuth } from "../context/AuthContext.jsx"
 import toast from "react-hot-toast"
 
 const Loginform = ({ role, title, subtitle }) => {
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
+    const [email, setEmail] = useState(role === "admin" ? "admin@example.com" : "ritik@example.com")
+    const [password, setPassword] = useState(role === "admin" ? "admin123" : "ritik123")
     const [showPassword, setShowPassword] = useState(false)
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
@@ -56,7 +56,7 @@ const Loginform = ({ role, title, subtitle }) => {
                         <div>
                             <label className='bloack text-sm font-medium text-slate-700 mb-2'>Password</label>
                             <div className='relative'>
-                                <input type={showPassword ? 'text' : 'password'} onChange={(e) => setPassword(e.target.value)} required className='pr-11' placeholder='........' />
+                                <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} required className='pr-11' placeholder='........' />
                                 <button type='button' className='absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors' onClick={() => setShowPassword(!showPassword)}>
                                     {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
                                 </button>
