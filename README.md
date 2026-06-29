@@ -76,7 +76,7 @@ Follow these steps to get a local copy up and running in under 5 minutes.
 
 1. **Clone the repo**
 ```bash
-git clone https://github.com/[YOUR_USERNAME]/ems-platform.git
+git clone https://github.com/Sakshya10027/ems-platform.git
 cd ems-platform
 ```
 
