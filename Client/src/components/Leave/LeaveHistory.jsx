@@ -1,6 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
+import api from '../../api/axios';
+import toast from 'react-hot-toast';
 
 const LeaveHistory = ({ leaves, isAdmin, onStatusUpdate }) => {
+    const [processing, setProcessing] = useState(null);
+
+    const handleStatusUpdate = async (id, status) => {
+        setProcessing(id);
+        try {
+            await api.patch(`/leave/${id}`, { status });
+            onStatusUpdate(id, status);
+        } catch (error) {
+            toast.error(error?.response?.data?.error || error?.message);
+        } finally {
+            setProcessing(null);
+        }
+    };
+
     const formatDateRange = (start, end) => {
         const startDate = new Date(start).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         const endDate = new Date(end).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -67,16 +83,18 @@ const LeaveHistory = ({ leaves, isAdmin, onStatusUpdate }) => {
                                             {record.status === 'PENDING' ? (
                                                 <div className="flex items-center gap-2">
                                                     <button 
-                                                        onClick={() => onStatusUpdate(record._id, 'APPROVED')}
-                                                        className="px-3 py-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-md text-[11px] font-bold transition-colors uppercase tracking-wider"
+                                                        onClick={() => handleStatusUpdate(record._id, 'APPROVED')}
+                                                        disabled={processing === record._id}
+                                                        className="px-3 py-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-md text-[11px] font-bold transition-colors uppercase tracking-wider disabled:opacity-50"
                                                     >
-                                                        Approve
+                                                        {processing === record._id ? "..." : "Approve"}
                                                     </button>
                                                     <button 
-                                                        onClick={() => onStatusUpdate(record._id, 'REJECTED')}
-                                                        className="px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-md text-[11px] font-bold transition-colors uppercase tracking-wider"
+                                                        onClick={() => handleStatusUpdate(record._id, 'REJECTED')}
+                                                        disabled={processing === record._id}
+                                                        className="px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-md text-[11px] font-bold transition-colors uppercase tracking-wider disabled:opacity-50"
                                                     >
-                                                        Reject
+                                                        {processing === record._id ? "..." : "Reject"}
                                                     </button>
                                                 </div>
                                             ) : (
