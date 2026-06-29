@@ -2,6 +2,7 @@ import { Inngest } from "inngest";
 import Attendance from "../models/Attendance.js";
 import Employee from "../models/Employee.js";
 import LeaveApplication from "../models/LeaveApplication.js";
+import sendEmail from "../config/nodemailer.js";
 
 // Create a client to send and receive events
 export const inngest = new Inngest({ id: "fullstack-ems" });
@@ -23,6 +24,20 @@ const autoCheckOut = inngest.createFunction(
             const employee = await Employee.findById(employeeId)
 
             // Send reminder email
+            await sendEmail({
+                to: employee.email,
+                subject: "Attendance Check-Out Remainder",
+                body: `<div style="max-width: 600px;">
+                        <h2>Hi ${employee.firstName}, 👋</h2>
+                        <p style="font-size: 16px;">You have a check-in in ${employee.department} today:</p>
+                        <p style="font-size: 18px; font-weight: bold; color: #007bff; margin: 8px 0;">${attendance?.checkIn?.toLocaleString()}</p>
+                        <p style="font-size: 16px;">Please make sure to check-out in one hour.</p>
+                        <p style="font-size: 16px;">If you have any questions, please contact your admin.</p>
+                        <br />
+                        <p style="font-size: 16px;">Best Regards,</p>
+                        <p style="font-size: 16px;">EMS</p>
+                        </div>`
+            })
 
             // After 10 hours , mark attendance as checked out with status "LATE"
             await step.sleepUntil("wait-for-the-1-hour", new Date(new Date().getTime() + 1 * 60 * 60 * 1000))
@@ -55,6 +70,19 @@ const leaveApplicationReminder = inngest.createFunction(
             const employee = await Employee.findById(leaveApplication.employeeId)
 
             //  Send reminder email to admin to take action on leave application
+            await sendEmail({
+                to: process.env.ADMIN_EMAIL,
+                subject: `Leave Application Reminder`,
+                body: `<div style="max-width: 600px;">
+                        <h2>Hi Admin, 👋</h2>
+                        <p style="font-size: 16px;">You have a leave application in ${employee.department} today:</p>
+                        <p style="font-size: 18px; font-weight: bold; color: #007bff; margin: 8px 0;">${leaveApplication?.startDate?.toLocaleDateString()}</p>
+                        <p style="font-size: 16px;">Please make sure to take action on this leave application.</p>
+                        <br />
+                        <p style="font-size: 16px;">Best Regards,</p>
+                        <p style="font-size: 16px;">EMS</p>
+                        </div>`
+            })
         }
     }
 );
@@ -112,7 +140,19 @@ const attendanceReminderCron = inngest.createFunction(
             await step.run("send-reminder-emails", async () => {
                 // Here you would integrate with an email service (e.g. Resend, SendGrid)
                 for (const emp of absentEmployees) {
-                    console.log(`Sending attendance reminder to ${emp.email} (${emp.firstName} ${emp.lastName})`);
+                    await sendEmail({
+                        to: emp.email,
+                        subject: "Attendance Reminder",
+                        body: `<div style="max-width: 600px;">
+                                <h2>Hi ${emp.firstName}, 👋</h2>
+                                <p style="font-size: 16px;">We noticed you haven't checked in today.</p>
+                                <p style="font-size: 16px;">Please make sure to log your attendance if you are working.</p>
+                                <p style="font-size: 16px;">If you have any questions, please contact your admin.</p>
+                                <br />
+                                <p style="font-size: 16px;">Best Regards,</p>
+                                <p style="font-size: 16px;">EMS</p>
+                                </div>`
+                    })
                 }
                 return { success: true, emailsSent: absentEmployees.length };
             });
