@@ -62,7 +62,7 @@ const PayslipList = ({ payslips, isAdmin }) => {
                                         -{formatCurrency(record.deductions)}
                                     </td>
                                     <td className="px-6 py-5 text-right font-bold text-slate-900">
-                                        {formatCurrency(record.netSalary)}
+                                        {formatCurrency(record.netsalary)}
                                     </td>
                                     <td className="px-6 py-5 text-center">
                                         <Link 

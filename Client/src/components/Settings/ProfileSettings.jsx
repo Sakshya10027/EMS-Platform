@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { UserIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import api from '../../api/axios';
 
 const ProfileSettings = ({ profile }) => {
     const [formData, setFormData] = useState({
@@ -10,13 +11,30 @@ const ProfileSettings = ({ profile }) => {
         bio: profile?.bio || ''
     });
 
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [message, setMessage] = useState("");
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        toast.success("Profile updated successfully!");
+        setLoading(true);
+        setError("");
+        setMessage("");
+        
+        try {
+            await api.post("/profile", formData);
+            setMessage("Profile updated successfully");
+            toast.success("Profile updated successfully!");
+        } catch (err) {
+            setError(err.response?.data?.error || err.message);
+            toast.error(err.response?.data?.error || err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -34,9 +52,8 @@ const ProfileSettings = ({ profile }) => {
                             type="text" 
                             name="fullName"
                             value={formData.fullName}
-                            onChange={handleChange}
-                            className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-slate-700 text-sm bg-slate-50/50"
-                            required
+                            readOnly
+                            className="w-full px-4 py-2.5 rounded-lg border border-slate-200 bg-slate-100 text-slate-500 text-sm cursor-not-allowed outline-none"
                         />
                     </div>
                     <div>
@@ -45,9 +62,8 @@ const ProfileSettings = ({ profile }) => {
                             type="email" 
                             name="email"
                             value={formData.email}
-                            onChange={handleChange}
-                            className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-slate-700 text-sm bg-slate-50/50"
-                            required
+                            readOnly
+                            className="w-full px-4 py-2.5 rounded-lg border border-slate-200 bg-slate-100 text-slate-500 text-sm cursor-not-allowed outline-none"
                         />
                     </div>
                 </div>
@@ -58,8 +74,8 @@ const ProfileSettings = ({ profile }) => {
                         type="text" 
                         name="position"
                         value={formData.position}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-slate-700 text-sm bg-slate-50/50"
+                        readOnly
+                        className="w-full px-4 py-2.5 rounded-lg border border-slate-200 bg-slate-100 text-slate-500 text-sm cursor-not-allowed outline-none"
                     />
                 </div>
 
@@ -79,9 +95,10 @@ const ProfileSettings = ({ profile }) => {
                 <div className="pt-2 flex justify-end">
                     <button 
                         type="submit"
-                        className="px-6 py-2.5 bg-[#5A67D8] text-white text-[13px] font-medium rounded-lg hover:bg-indigo-700 transition-colors focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 flex items-center gap-2"
+                        disabled={loading}
+                        className="px-6 py-2.5 bg-[#5A67D8] text-white text-[13px] font-medium rounded-lg hover:bg-indigo-700 transition-colors focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 flex items-center gap-2 disabled:opacity-50"
                     >
-                        Save Changes
+                        {loading ? "Saving..." : "Save Changes"}
                     </button>
                 </div>
             </form>

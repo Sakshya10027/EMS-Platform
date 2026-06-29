@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { XIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import api from '../../api/axios';
 
 const GeneratePayslipModal = ({ isOpen, onClose, onSubmit, employees }) => {
     const [formData, setFormData] = useState({
@@ -11,6 +12,7 @@ const GeneratePayslipModal = ({ isOpen, onClose, onSubmit, employees }) => {
         allowances: 0,
         deductions: 0
     });
+    const [loading, setLoading] = useState(false);
 
     // Auto-fill basic salary if employee is selected
     useEffect(() => {
@@ -31,36 +33,43 @@ const GeneratePayslipModal = ({ isOpen, onClose, onSubmit, employees }) => {
 
     const netSalary = Number(formData.basicSalary) + Number(formData.allowances) - Number(formData.deductions);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if(!formData.employeeId || !formData.month || !formData.year) {
             toast.error("Please fill all required fields");
             return;
         }
 
-        const selectedEmployee = employees.find(e => e._id === formData.employeeId || e.id === formData.employeeId);
+        setLoading(true);
+        try {
+            const selectedEmployee = employees.find(e => e._id === formData.employeeId || e.id === formData.employeeId);
+            const payload = {
+                ...formData,
+                basicSalary: Number(formData.basicSalary),
+                allowances: Number(formData.allowances),
+                deductions: Number(formData.deductions),
+                netSalary,
+                employee: selectedEmployee
+            };
 
-        onSubmit({
-            ...formData,
-            basicSalary: Number(formData.basicSalary),
-            allowances: Number(formData.allowances),
-            deductions: Number(formData.deductions),
-            netSalary,
-            employee: selectedEmployee,
-            _id: Math.random().toString(),
-            createdAt: new Date().toISOString()
-        });
-        
-        toast.success("Payslip generated successfully");
-        setFormData({
-            employeeId: '',
-            month: new Date().getMonth() + 1,
-            year: new Date().getFullYear(),
-            basicSalary: 0,
-            allowances: 0,
-            deductions: 0
-        });
-        onClose();
+            const res = await api.post('/payslips', payload);
+            
+            toast.success("Payslip generated successfully");
+            onSubmit(res.data.data);
+            setFormData({
+                employeeId: '',
+                month: new Date().getMonth() + 1,
+                year: new Date().getFullYear(),
+                basicSalary: 0,
+                allowances: 0,
+                deductions: 0
+            });
+            onClose();
+        } catch (err) {
+            toast.error(err.response?.data?.error || err?.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -172,9 +181,10 @@ const GeneratePayslipModal = ({ isOpen, onClose, onSubmit, employees }) => {
                         </button>
                         <button 
                             type="submit"
-                            className="flex-1 px-4 py-2.5 rounded-xl bg-indigo-600 text-white font-medium hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/20 transition-all focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 outline-none"
+                            disabled={loading}
+                            className="flex-1 px-4 py-2.5 rounded-xl bg-indigo-600 text-white font-medium hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/20 transition-all focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 outline-none disabled:opacity-50"
                         >
-                            Generate Payslip
+                            {loading ? "Generating..." : "Generate Payslip"}
                         </button>
                     </div>
                 </form>
