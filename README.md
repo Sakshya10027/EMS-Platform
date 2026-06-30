@@ -44,12 +44,12 @@ By providing distinct and secure portals for administrators and employees, EMS e
 
 ## Features
 
-- 🔐 **Role-Based Access Control:** Dedicated, secure portals for both Admins and Employees with restricted data boundaries.
-- ⏱️ **Automated Attendance Tracking:** One-click check-ins and check-outs with dynamic UI updates and daily logging.
-- 🏖️ **Leave Management System:** Streamlined employee leave requests with an intuitive admin approval/rejection workflow.
-- 💵 **Dynamic Payslip Generation:** Instantly calculate net salaries and generate organized, downloadable payslips.
-- 🤖 **Background Cron Jobs:** Automated reminders and attendance checks powered by Inngest.
-- 🎨 **Modern, Responsive UI:** A premium, intuitive interface built with React and Tailwind CSS.
+- **Role-Based Access Control:** Dedicated, secure portals for both Admins and Employees with restricted data boundaries.
+- **Automated Attendance Tracking:** One-click check-ins and check-outs with dynamic UI updates and daily logging.
+- **Leave Management System:** Streamlined employee leave requests with an intuitive admin approval/rejection workflow.
+- **Dynamic Payslip Generation:** Instantly calculate net salaries and generate organized, downloadable payslips.
+- **Background Cron Jobs:** Automated reminders and attendance checks powered by Inngest.
+- **Modern, Responsive UI:** A premium, intuitive interface built with React and Tailwind CSS.
 
 ## Tech Stack
 
