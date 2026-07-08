@@ -12,7 +12,7 @@ A full-stack HR platform for streamlining workforce operations — automated att
 
 <br />
 
-[Live Demo]() · [Documentation](#overview) · [Report Bug](https://github.com/Sakshya10027/ems-platform/issues) · [Request Feature](https://github.com/Sakshya10027/ems-platform/issues)
+[Live Demo](https://ems-platform-black.vercel.app/login) · [Documentation](#overview) · [Report Bug](https://github.com/Sakshya10027/ems-platform/issues) · [Request Feature](https://github.com/Sakshya10027/ems-platform/issues)
 
 </div>
 
