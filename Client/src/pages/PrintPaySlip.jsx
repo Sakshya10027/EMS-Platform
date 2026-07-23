@@ -72,7 +72,7 @@ const PrintPaySlip = () => {
                             <td className="py-4 px-4 text-slate-900 font-bold">
                                 Net Salary
                             </td>
-                            <td className="text-right py-4 px-4 text-slate-900 font-bold text-lg">${payslip.netSalary?.toLocaleString()}</td>
+                            <td className="text-right py-4 px-4 text-slate-900 font-bold text-lg">${payslip.netsalary?.toLocaleString()}</td>
                         </tr>
                     </tbody>
                 </table>
